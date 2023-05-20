@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bnpl-edge-service
+  labels:
+    app: bnpl-edge-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bnpl-edge-service
+  template:
+    metadata:
+      labels:
+        app: bnpl-edge-service
+    spec:
+      containers:
+        - name: bnpl-edge-service
+          image: bnpl-edge-service
+          imagePullPolicy: IfNotPresent
+          lifecycle:
+            preStop:
+              exec:
+                command: [ "sh", "-c", "sleep 5" ]
+          ports:
+            - containerPort: 9000
+          env:
+            - name: CATALOG_SERVICE_URL
+              value: http://bnpl-catalog-service
+            - name: ORDER_SERVICE_URL
+              value: http://bnpl-order-service
+#            - name: SPA_URL
+#              value: http://polar-ui
+            - name: SPRING_CLOUD_CONFIG_URI
+              value: http://bnpl-config-service
+            - name: SPRING_REDIS_HOST
+              value: bnpl-redis

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: bnpl-edge-service
+  labels:
+    app: bnpl-edge-service
+spec:
+  type: ClusterIP
+  selector:
+    app: bnpl-edge-service
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 9000
