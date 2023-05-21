@@ -17,7 +17,7 @@ import static org.mockito.Mockito.when;
 
 @WebFluxTest
 @Import(SecurityConfig.class)
-class SecurityConfigTests {
+class SecurityConfigTest {
 
     @Autowired
     WebTestClient webClient;
