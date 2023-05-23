@@ -1,5 +1,8 @@
 package com.bnpl.edgeservice.config;
 
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.oauth2.client.web.server.ServerOAuth2AuthorizedClientRepository;
+import org.springframework.security.oauth2.client.web.server.WebSessionServerOAuth2AuthorizedClientRepository;
 import reactor.core.publisher.Mono;
 
 import org.springframework.context.annotation.Bean;
@@ -17,15 +20,23 @@ import org.springframework.security.web.server.csrf.CookieServerCsrfTokenReposit
 import org.springframework.security.web.server.csrf.CsrfToken;
 import org.springframework.web.server.WebFilter;
 
+@Configuration
 @EnableWebFluxSecurity
 public class SecurityConfig {
 
     @Bean
+    ServerOAuth2AuthorizedClientRepository authorizedClientRepository() {
+        return new WebSessionServerOAuth2AuthorizedClientRepository();
+    }
+
+    @Bean
     SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http, ReactiveClientRegistrationRepository clientRegistrationRepository) {
+
         return http
                 .authorizeExchange(exchange -> exchange
                         .pathMatchers("/", "/*.css", "/*.js", "/favicon.ico").permitAll()
                         .pathMatchers(HttpMethod.GET, "/properties/**").permitAll()
+                        .pathMatchers("/actuator/**").permitAll()
                         .anyExchange().authenticated()
                 )
                 .exceptionHandling(exceptionHandling -> exceptionHandling

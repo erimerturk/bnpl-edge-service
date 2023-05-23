@@ -13,6 +13,10 @@ spec:
     metadata:
       labels:
         app: bnpl-edge-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: /actuator/prometheus
+        prometheus.io/port: "9000"
     spec:
       containers:
         - name: bnpl-edge-service
@@ -29,10 +33,22 @@ spec:
               value: http://bnpl-catalog-service
             - name: ORDER_SERVICE_URL
               value: http://bnpl-order-service
-            - name: SPRING_CLOUD_CONFIG_URI
-              value: http://bnpl-config-service
-            - name: SPRING_REDIS_HOST
-              value: bnpl-redis
-            - name: SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_ISSUER_URI
-              value: http://bnpl-keycloak/realms/BNPLRealEstate
-
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 9000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 9000
+            initialDelaySeconds: 5
+            periodSeconds: 15
+          volumeMounts:
+            - name: bnpl-edge-config-volume
+              mountPath: /workspace/config
+      volumes:
+        - name: bnpl-edge-config-volume
+          configMap:
+            name: bnpl-edge-config
